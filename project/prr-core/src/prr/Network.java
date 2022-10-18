@@ -1,10 +1,25 @@
 package prr;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+
+import prr.clients.Client;
+
 import prr.exceptions.UnrecognizedEntryException;
+import prr.exceptions.DuplicateClientKeyException;
+import prr.exceptions.DuplicateTerminalKeyException;
+import prr.exceptions.InvalidTerminalKeyException;
+import prr.exceptions.UnknownClientKeyException;
+
+import prr.terminals.BasicTerminal;
+import prr.terminals.FancyTerminal;
+import prr.terminals.Terminal;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 // FIXME add more import if needed (cannot import from pt.tecnico or prr.app)
 
@@ -21,6 +36,21 @@ public class Network implements Serializable {
 	// FIXME define methods
 
 	/**
+	 * Stores the network's clients.
+	 */
+	private final Map<String, Client> clients = new TreeMap<>();
+
+	/**
+	 * Stores the network's terminals.
+	 */
+	private final Map<String, Terminal> terminals = new TreeMap<>();
+
+	/**
+	 * Stores the network's communications.
+	 */
+	// private final Map<String, Client> clients = new TreeMap<>();
+
+	/**
 	 * Read text input file and create corresponding domain entities.
 	 * 
 	 * @param filename name of the text input file
@@ -35,10 +65,10 @@ public class Network implements Serializable {
 			while ((line = in.readLine()) != null) {
 				String[] fields = line.split("\\|");
 				switch (fields[0]) {
-				case "CLIENT" -> this.registerClient(fields);
-				case "BASIC", "FANCY" -> this.registerTerminal(fields);
-				case "FRIENDS" -> this.registerFriends(fields);
-				default -> throw new UnrecognizedEntryException(String.join("|", fields));
+					case "CLIENT" -> this.registerClient(field[1], field[2], field[3]);
+					case "BASIC", "FANCY" -> this.registerTerminal(field[0], field[1], field[2], field[3]);
+					case "FRIENDS" -> this.registerFriends(fields);
+					default -> throw new UnrecognizedEntryException(String.join("|", fields));
 				}
 			}
 		}
@@ -51,10 +81,15 @@ public class Network implements Serializable {
 	 *
 	 * @param fields The fields of the client to import, that were split by the
 	 *               separator
-	 * @throws UnknownDataException if the entry does not have the correct fields
-	 *                              for its type
+	 * @throws DuplicateClientKeyException if already exists a client with the given
+	 *                                     key.
 	 */
-	private void registerClient(String[] fields) throws UnknownDataException {
+	private void registerClient(String key, String name, int taxId) throws DuplicateClientKeyException {
+		if (clients.containsKey(key))
+			throw new DuplicateClientKeyException(key);
+
+		Client newClient = new Client(key, name, taxId);
+		clients.put(key, newClient);
 
 	}
 
@@ -66,10 +101,27 @@ public class Network implements Serializable {
 	 *
 	 * @param fields The fields of the terminal to import, that were split by the
 	 *               separator
-	 * @throws UnknownDataException if the entry does not have the correct fields
-	 *                              for its type
+	 * @throws UnrecognizedEntryException if the entry does not have the correct
+	 *                                    fields for its type
 	 */
-	private void registerTerminal(String[] fields) throws UnknownDataException {
+	private void registerTerminal(String type, String key, String keyClient, String state)
+			throws InvalidTerminalKeyException, DuplicateTerminalKeyException,
+			UnknownClientKeyException, UnrecognizedEntryException {
+		if (!key.matches("\\d{6}"))
+			throw new InvalidTerminalKeyException(key);
+		if (terminals.get(key) != null)
+			throw new DuplicateTerminalKeyException(key);
+
+		Client terminalsClient = clients.get(keyClient);
+		if (terminalsClient == null)
+			throw new UnknownClientKeyException(keyClient);
+
+		Terminal newTerminal = switch (type) {
+			case "BASIC" -> new BasicTerminal(key, terminalsClient, state);
+			case "FANCY" -> new FancyTerminal(key, terminalsClient, state);
+			default -> throw new UnrecognizedEntryException(type);
+		};
+		terminals.put(key, newTerminal);
 
 	}
 
