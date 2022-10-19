@@ -18,6 +18,9 @@ import prr.terminals.BasicTerminal;
 import prr.terminals.FancyTerminal;
 import prr.terminals.Terminal;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -114,9 +117,7 @@ public class Network implements Serializable {
 		if (terminals.get(key) != null)
 			throw new DuplicateTerminalKeyException(key);
 
-		Client terminalsClient = clients.get(keyClient);
-		if (terminalsClient == null)
-			throw new UnknownClientKeyException(keyClient);
+		Client terminalsClient = getClientByKey(keyClient);
 
 		Terminal newTerminal = switch (type) {
 			case "BASIC" -> new BasicTerminal(key, terminalsClient, state);
@@ -142,4 +143,32 @@ public class Network implements Serializable {
 	public void registerFriends(String[] fields) throws UnrecognizedEntryException {
 
 	}
+
+	public String showClient(String key) throws UnknownClientKeyException {
+		Client client = getClientByKey(key);
+		return client.toString();
+	}
+
+	public Collection<String> showAllClients() {
+		List<String> clienStrings = new ArrayList<String>();
+		for (Client client : clients.values()) {
+			clienStrings.add(client.toString());
+		}
+		return clienStrings;
+	}
+
+	public Client getClientByKey(String key) throws UnknownClientKeyException {
+		Client client = clients.get(key);
+		if (client == null)
+			throw new UnknownClientKeyException(key);
+		return client;
+	}
+
+	// public Terminal getTerminalByKey(String key) throws
+	// UnknownTerminalKeyException {
+	// Terminal terminal = terminals.get(key);
+	// if (terminal == null)
+	// throw new UnknownTerminalKeyException(key);
+	// return terminal;
+	// }
 }

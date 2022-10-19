@@ -1,6 +1,9 @@
 package prr.clients;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.plaf.basic.BasicTreeUI.TreeCancelEditingAction;
 
@@ -16,17 +19,20 @@ public class Client implements Serializable {
     private String key;
     private String name;
     private int taxId;
+    private boolean allowNotifications;
 
+    private List<Terminal> terminals;
+    private ClientLevel level;
     /* atributos que ainda não estão implementados */
-    // private boolean allowNotifications = true;
-    // private Terminal[] terminals;
-    // private ClientLevel level;
     // private Notification[] notifications;
 
     public Client(String key, String name, int taxId) throws DuplicateClientKeyException {
         this.key = key;
         this.name = name;
         this.taxId = taxId;
+        level = new ClientLevel(this);
+        allowNotifications = true;
+        terminals = new ArrayList<Terminal>();
     }
 
     public String getKey() {
@@ -41,6 +47,14 @@ public class Client implements Serializable {
     // return this.taxId;
     // }
 
+    public int calculatePayments() {
+        return 0;
+    }
+
+    public int calculateDebts() {
+        return 0;
+    }
+
     /*
      * Return client in the correct format.
      * The correct format
@@ -48,7 +62,8 @@ public class Client implements Serializable {
      */
     @Override
     public String toString() {
-        return "CLIENT|" + key + "|" + name + "|" + taxId + "|...";
+        return "CLIENT|" + key + "|" + name + "|" + taxId + "|" + level.status() + "|" + (allowNotifications ? "YES"
+                : "NO") + "|" + terminals.size() + "|" + calculatePayments() + "|" + calculateDebts();
     }
 
 }
