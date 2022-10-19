@@ -125,6 +125,7 @@ public class Network implements Serializable {
 			case "FANCY" -> new FancyTerminal(key, terminalsClient, state);
 			default -> throw new UnrecognizedEntryException(type);
 		};
+		// System.out.println("DDDDDDDDDDDDDDDDDDDD" + newTerminal.getState);
 		terminals.put(key, newTerminal);
 
 	}

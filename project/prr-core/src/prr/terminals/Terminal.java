@@ -27,14 +27,16 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         private Client client;
         // private List<Terminal> terminalsFriends;
         // private List<Communications> communications;
-        private TerminalState state;
+        // private TerminalState state;
+        private String state = "IDLE";
 
         public Terminal(String key, Client client) {
                 this.key = key;
                 this.client = client;
                 // payments = 0;
                 // debts = 0;
-                state = new TerminalState(this);
+                // state = new TerminalState(this);
+                state = "IDLE";
 
         }
 
@@ -43,8 +45,13 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                 this.client = client;
                 // payments = 0;
                 // debts = 0;
-                this.state = new TerminalState(this);
-                this.state.setState(state);
+                // this.state = new TerminalState(this);
+                // this.state.setState(state);
+                this.state = state;
+                if (state.equals("ON"))
+                        this.state = "IDLE";
+                // System.out.println("AAAAAAAAAAAAAAAAAAAAA - " + state);
+                // System.out.println("BBBBBBBBBBBBBBBBBBBBB - " + this.state);
         }
 
         public void setType(String type) {
@@ -75,7 +82,11 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         @Override
         public String toString() {
-                return type + "|" + key + "|" + client.getKey() + "|" + state.status() + "|" + payments + "|"
-                                + debts; /* faltam os friends */
+                // return type + "|" + key + "|" + client.getKey() + "|" + state.status() + "|"
+                // + payments + "|"
+                // + debts; /* faltam os friends */
+                // System.out.println("CCCCCCCCCCCCCCCCCCC - " + this.state);
+                return type + "|" + key + "|" + client.getKey() + "|" + this.state + "|" + Math.round(payments) + "|"
+                                + Math.round(debts); /* faltam os friends */
         }
 }

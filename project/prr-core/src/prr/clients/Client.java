@@ -19,7 +19,9 @@ public class Client implements Serializable {
     private boolean allowNotifications;
 
     private List<Terminal> terminals;
-    private ClientLevel level;
+
+    // private ClientLevel level;
+    private String level = "NORMAL";
     /* atributos que ainda não estão implementados */
     // private Notification[] notifications;
 
@@ -27,7 +29,7 @@ public class Client implements Serializable {
         this.key = key;
         this.name = name;
         this.taxId = taxId;
-        level = new ClientLevel(this);
+        // level = new ClientLevel(this);
         allowNotifications = true;
         terminals = new ArrayList<Terminal>();
     }
@@ -59,8 +61,12 @@ public class Client implements Serializable {
      */
     @Override
     public String toString() {
-        return "CLIENT|" + key + "|" + name + "|" + taxId + "|" + level.status() + "|" + (allowNotifications ? "YES"
+        return "CLIENT|" + key + "|" + name + "|" + taxId + "|" + level + "|" + (allowNotifications ? "YES"
                 : "NO") + "|" + terminals.size() + "|" + calculatePayments() + "|" + calculateDebts();
+        // return "CLIENT|" + key + "|" + name + "|" + taxId + "|" + level.status() +
+        // "|" + (allowNotifications ? "YES"
+        // : "NO") + "|" + terminals.size() + "|" + calculatePayments() + "|" +
+        // calculateDebts();
     }
 
 }
