@@ -58,15 +58,17 @@ public class Network implements Serializable {
 	 * @throws IOException                if there is an IO erro while processing
 	 *                                    the text file
 	 */
-	void importFile(String filename) throws UnrecognizedEntryException, IOException /* FIXME maybe other exceptions */ {
+	void importFile(String filename)
+			throws UnrecognizedEntryException, IOException, DuplicateClientKeyException, InvalidTerminalKeyException,
+			DuplicateTerminalKeyException, UnknownClientKeyException /* FIXME maybe other exceptions */ {
 		// FIXME implement method
 		try (BufferedReader in = new BufferedReader(new FileReader(filename))) {
 			String line;
 			while ((line = in.readLine()) != null) {
 				String[] fields = line.split("\\|");
 				switch (fields[0]) {
-					case "CLIENT" -> this.registerClient(field[1], field[2], field[3]);
-					case "BASIC", "FANCY" -> this.registerTerminal(field[0], field[1], field[2], field[3]);
+					case "CLIENT" -> this.registerClient(fields[1], fields[2], Integer.parseInt(fields[3]));
+					case "BASIC", "FANCY" -> this.registerTerminal(fields[0], fields[1], fields[2], fields[3]);
 					case "FRIENDS" -> this.registerFriends(fields);
 					default -> throw new UnrecognizedEntryException(String.join("|", fields));
 				}
@@ -84,7 +86,7 @@ public class Network implements Serializable {
 	 * @throws DuplicateClientKeyException if already exists a client with the given
 	 *                                     key.
 	 */
-	private void registerClient(String key, String name, int taxId) throws DuplicateClientKeyException {
+	public void registerClient(String key, String name, int taxId) throws DuplicateClientKeyException {
 		if (clients.containsKey(key))
 			throw new DuplicateClientKeyException(key);
 
@@ -104,7 +106,7 @@ public class Network implements Serializable {
 	 * @throws UnrecognizedEntryException if the entry does not have the correct
 	 *                                    fields for its type
 	 */
-	private void registerTerminal(String type, String key, String keyClient, String state)
+	public void registerTerminal(String type, String key, String keyClient, String state)
 			throws InvalidTerminalKeyException, DuplicateTerminalKeyException,
 			UnknownClientKeyException, UnrecognizedEntryException {
 		if (!key.matches("\\d{6}"))
@@ -133,10 +135,11 @@ public class Network implements Serializable {
 	 *
 	 * @param fields The fields of the friends connection to import, that were split
 	 *               by the separator
-	 * @throws UnknownDataException if the entry does not have the correct fields
-	 *                              for its type
+	 * @throws UnrecognizedEntryException if the entry does not have the correct
+	 *                                    fields
+	 *                                    for its type
 	 */
-	private void registerFriends(String[] fields) throws UnknownDataException {
+	public void registerFriends(String[] fields) throws UnrecognizedEntryException {
 
 	}
 }

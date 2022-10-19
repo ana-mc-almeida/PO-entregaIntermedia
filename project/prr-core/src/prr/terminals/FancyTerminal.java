@@ -1,13 +1,17 @@
 package prr.terminals;
 
-public class FancyTerminal implements Terminal {
+import prr.clients.Client;
+
+public class FancyTerminal extends Terminal {
     public FancyTerminal(String key, Client client) {
         super(key, client);
-        type = "fancy";
+        // type = "fancy";
+        setType("fancy");
     }
 
     public FancyTerminal(String key, Client client, String state) {
         super(key, client, state);
-        type = "fancy";
+        // type = "fancy";
+        setType("fancy");
     }
 }

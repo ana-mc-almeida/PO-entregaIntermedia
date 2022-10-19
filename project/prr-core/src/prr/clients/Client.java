@@ -6,6 +6,7 @@ import javax.swing.plaf.basic.BasicTreeUI.TreeCancelEditingAction;
 
 import prr.Network;
 import prr.terminals.Terminal;
+import prr.exceptions.DuplicateClientKeyException;
 
 public class Client implements Serializable {
 
@@ -28,9 +29,9 @@ public class Client implements Serializable {
         this.taxId = taxId;
     }
 
-    // public String getKey() {
-    // return this.key;
-    // }
+    public String getKey() {
+        return this.key;
+    }
 
     // public String getName() {
     // return this.name;

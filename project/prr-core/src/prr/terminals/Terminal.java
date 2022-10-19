@@ -38,6 +38,10 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                 /* FIXME tratar dos states */
         }
 
+        public void setType(String type) {
+                this.type = type;
+        }
+
         /**
          * Checks if this terminal can end the current interactive communication.
          *
@@ -58,5 +62,10 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         public boolean canStartCommunication() {
                 // FIXME add implementation code
                 return false;
+        }
+
+        @Override
+        public String toString() {
+                return "key:" + key + ", type:" + type + ", Client Key" + client.getKey();
         }
 }
