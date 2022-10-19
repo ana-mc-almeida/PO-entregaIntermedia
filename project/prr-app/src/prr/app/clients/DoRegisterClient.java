@@ -14,7 +14,7 @@ class DoRegisterClient extends Command<Network> {
 	DoRegisterClient(Network receiver) {
 		super(Label.REGISTER_CLIENT, receiver);
 		// FIXME add command fields
-		addStringField("id", Prompt.key());
+		addStringField("key", Prompt.key());
 		addStringField("name", Prompt.name());
 		addIntegerField("taxId", Prompt.taxId());
 	}
@@ -24,7 +24,7 @@ class DoRegisterClient extends Command<Network> {
 		// FIXME implement command
 		try {
 			_receiver.registerClient(
-					stringField("id"),
+					stringField("key"),
 					stringField("name"),
 					integerField("taxId"));
 		} catch (prr.exceptions.DuplicateClientKeyException e) {

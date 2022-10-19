@@ -1,6 +1,8 @@
 package prr.terminals;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import prr.clients.Client;
 
@@ -20,22 +22,29 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         private String key;
         private String type;
-        // private Double debts = 0;
-        // private Double payments = 0;
+        private Double debts = 0.0;
+        private Double payments = 0.0;
         private Client client;
-        // private Terminal[] terminalsFriends;
-        // private Communication[];
-        // private String state;
+        // private List<Terminal> terminalsFriends;
+        // private List<Communications> communications;
+        private TerminalState state;
 
         public Terminal(String key, Client client) {
                 this.key = key;
                 this.client = client;
+                // payments = 0;
+                // debts = 0;
+                state = new TerminalState(this);
+
         }
 
         public Terminal(String key, Client client, String state) {
                 this.key = key;
                 this.client = client;
-                /* FIXME tratar dos states */
+                // payments = 0;
+                // debts = 0;
+                this.state = new TerminalState(this);
+                this.state.setState(state);
         }
 
         public void setType(String type) {
@@ -66,6 +75,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         @Override
         public String toString() {
-                return "key:" + key + ", type:" + type + ", Client Key" + client.getKey();
+                return type + "|" + key + "|" + client.getKey() + "|" + state.status() + "|" + payments + "|"
+                                + debts; /* faltam os friends */
         }
 }

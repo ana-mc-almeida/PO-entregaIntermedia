@@ -13,6 +13,7 @@ import prr.exceptions.DuplicateClientKeyException;
 import prr.exceptions.DuplicateTerminalKeyException;
 import prr.exceptions.InvalidTerminalKeyException;
 import prr.exceptions.UnknownClientKeyException;
+import prr.exceptions.UnknownTerminalKeyException;
 
 import prr.terminals.BasicTerminal;
 import prr.terminals.FancyTerminal;
@@ -129,6 +130,36 @@ public class Network implements Serializable {
 	}
 
 	/**
+	 * Parse and import a terminal entry from a plain text file.
+	 * 
+	 * A correct terminal entry has the following format:
+	 * {@code terminal-type|idTerminal|idClient|state}
+	 *
+	 * @param fields The fields of the terminal to import, that were split by the
+	 *               separator
+	 * @throws UnrecognizedEntryException if the entry does not have the correct
+	 *                                    fields for its type
+	 */
+	public void registerTerminal(String type, String key, String keyClient)
+			throws InvalidTerminalKeyException, DuplicateTerminalKeyException,
+			UnknownClientKeyException, UnrecognizedEntryException {
+		if (!key.matches("\\d{6}"))
+			throw new InvalidTerminalKeyException(key);
+		if (terminals.get(key) != null)
+			throw new DuplicateTerminalKeyException(key);
+
+		Client terminalsClient = getClientByKey(keyClient);
+
+		Terminal newTerminal = switch (type) {
+			case "BASIC" -> new BasicTerminal(key, terminalsClient);
+			case "FANCY" -> new FancyTerminal(key, terminalsClient);
+			default -> throw new UnrecognizedEntryException(type);
+		};
+		terminals.put(key, newTerminal);
+
+	}
+
+	/**
 	 * Parse and import a friends entry from a plain text file.
 	 * 
 	 * A correct friends entry has the following format:
@@ -150,11 +181,11 @@ public class Network implements Serializable {
 	}
 
 	public Collection<String> showAllClients() {
-		List<String> clienStrings = new ArrayList<String>();
+		List<String> clientStrings = new ArrayList<String>();
 		for (Client client : clients.values()) {
-			clienStrings.add(client.toString());
+			clientStrings.add(client.toString());
 		}
-		return clienStrings;
+		return clientStrings;
 	}
 
 	public Client getClientByKey(String key) throws UnknownClientKeyException {
@@ -164,11 +195,23 @@ public class Network implements Serializable {
 		return client;
 	}
 
-	// public Terminal getTerminalByKey(String key) throws
-	// UnknownTerminalKeyException {
-	// Terminal terminal = terminals.get(key);
-	// if (terminal == null)
-	// throw new UnknownTerminalKeyException(key);
-	// return terminal;
-	// }
+	public String showTerminal(String key) throws UnknownTerminalKeyException {
+		Terminal terminal = getTerminalByKey(key);
+		return terminal.toString();
+	}
+
+	public Collection<String> showAllTerminals() {
+		List<String> terminalStrings = new ArrayList<String>();
+		for (Terminal terminal : terminals.values()) {
+			terminalStrings.add(terminal.toString());
+		}
+		return terminalStrings;
+	}
+
+	public Terminal getTerminalByKey(String key) throws UnknownTerminalKeyException {
+		Terminal terminal = terminals.get(key);
+		if (terminal == null)
+			throw new UnknownTerminalKeyException(key);
+		return terminal;
+	}
 }

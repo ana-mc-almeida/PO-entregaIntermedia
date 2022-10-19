@@ -3,9 +3,6 @@ package prr.clients;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-
-import javax.swing.plaf.basic.BasicTreeUI.TreeCancelEditingAction;
 
 import prr.Network;
 import prr.terminals.Terminal;
