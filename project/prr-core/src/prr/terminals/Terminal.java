@@ -77,7 +77,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          **/
         public boolean canStartCommunication() {
                 // FIXME add implementation code
-                return false;
+                return true;
         }
 
         @Override
