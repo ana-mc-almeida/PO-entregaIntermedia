@@ -38,6 +38,10 @@ public class Client implements Serializable {
         return this.key;
     }
 
+    public void addTerminal(Terminal terminal) {
+        terminals.add(terminal);
+    }
+
     // public String getName() {
     // return this.name;
     // }

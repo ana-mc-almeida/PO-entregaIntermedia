@@ -42,12 +42,12 @@ public class Network implements Serializable {
 	/**
 	 * Stores the network's clients.
 	 */
-	private final Map<String, Client> clients = new TreeMap<>();
+	private final Map<String, Client> clients = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
 	/**
 	 * Stores the network's terminals.
 	 */
-	private final Map<String, Terminal> terminals = new TreeMap<>();
+	private final Map<String, Terminal> terminals = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
 	/**
 	 * Stores the network's communications.
@@ -127,6 +127,7 @@ public class Network implements Serializable {
 		};
 		// System.out.println("DDDDDDDDDDDDDDDDDDDD" + newTerminal.getState);
 		terminals.put(key, newTerminal);
+		terminalsClient.addTerminal(newTerminal);
 
 	}
 
