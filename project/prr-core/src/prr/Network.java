@@ -17,7 +17,11 @@ import prr.exceptions.UnknownTerminalKeyException;
 
 import prr.terminals.BasicTerminal;
 import prr.terminals.FancyTerminal;
+import prr.terminals.StateIdle;
+import prr.terminals.StateOff;
+import prr.terminals.StateSilence;
 import prr.terminals.Terminal;
+import prr.terminals.TerminalState;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,7 +76,7 @@ public class Network implements Serializable {
 				String[] fields = line.split("\\|");
 				switch (fields[0]) {
 					case "CLIENT" -> this.registerClient(fields[1], fields[2], Integer.parseInt(fields[3]));
-					case "BASIC", "FANCY" -> this.registerTerminal(fields[0], fields[1], fields[2], fields[3]);
+					case "BASIC", "FANCY" -> this.importTerminal(fields[0], fields[1], fields[2], fields[3]);
 					case "FRIENDS" -> this.registerFriends(fields);
 					default -> throw new UnrecognizedEntryException(String.join("|", fields));
 				}
@@ -100,35 +104,35 @@ public class Network implements Serializable {
 	}
 
 	/**
-	 * Parse and import a terminal entry from a plain text file.
-	 * 
-	 * A correct terminal entry has the following format:
-	 * {@code terminal-type|idTerminal|idClient|state}
+	 * Parse and import a partner entry from a plain text file.
+	 * <p>
+	 * A correct partner entry has the following format:
+	 * {@code PARTNER|id|name|address}
 	 *
-	 * @param fields The fields of the terminal to import, that were split by the
+	 * @param fields The fields of the partner to import, that were split by the
 	 *               separator
-	 * @throws UnrecognizedEntryException if the entry does not have the correct
-	 *                                    fields for its type
+	 * @throws IllegalEntryException if the entry does not have the correct fields
+	 *                               for its type
 	 */
-	public void registerTerminal(String type, String key, String keyClient, String state)
-			throws InvalidTerminalKeyException, DuplicateTerminalKeyException,
+	private void importTerminal(String type, String key, String keyClient, String state)
+			throws UnrecognizedEntryException, InvalidTerminalKeyException, DuplicateTerminalKeyException,
 			UnknownClientKeyException, UnrecognizedEntryException {
-		if (!key.matches("\\d{6}"))
-			throw new InvalidTerminalKeyException(key);
-		if (terminals.get(key) != null)
-			throw new DuplicateTerminalKeyException(key);
+		TerminalState terminalState = getTerminalState(state);
+		Terminal terminal = registerTerminal(type, key, keyClient);
+		terminal.setState(terminalState);
+	}
 
-		Client terminalsClient = getClientByKey(keyClient);
-
-		Terminal newTerminal = switch (type) {
-			case "BASIC" -> new BasicTerminal(key, terminalsClient, state);
-			case "FANCY" -> new FancyTerminal(key, terminalsClient, state);
-			default -> throw new UnrecognizedEntryException(type);
+	/*
+	 * 
+	 * 
+	 */
+	private TerminalState getTerminalState(String state) throws UnrecognizedEntryException {
+		return switch (state) {
+			case "ON" -> new StateIdle();
+			case "OFF" -> new StateOff();
+			case "SILENCE" -> new StateSilence();
+			default -> throw new UnrecognizedEntryException(state);
 		};
-		// System.out.println("DDDDDDDDDDDDDDDDDDDD" + newTerminal.getState);
-		terminals.put(key, newTerminal);
-		terminalsClient.addTerminal(newTerminal);
-
 	}
 
 	/**
@@ -142,7 +146,7 @@ public class Network implements Serializable {
 	 * @throws UnrecognizedEntryException if the entry does not have the correct
 	 *                                    fields for its type
 	 */
-	public void registerTerminal(String type, String key, String keyClient)
+	public Terminal registerTerminal(String type, String key, String keyClient)
 			throws InvalidTerminalKeyException, DuplicateTerminalKeyException,
 			UnknownClientKeyException, UnrecognizedEntryException {
 		if (!key.matches("\\d{6}"))
@@ -152,13 +156,14 @@ public class Network implements Serializable {
 
 		Client terminalsClient = getClientByKey(keyClient);
 
-		Terminal newTerminal = switch (type) {
+		Terminal terminal = switch (type) {
 			case "BASIC" -> new BasicTerminal(key, terminalsClient);
 			case "FANCY" -> new FancyTerminal(key, terminalsClient);
 			default -> throw new UnrecognizedEntryException(type);
 		};
-		terminals.put(key, newTerminal);
-
+		terminals.put(key, terminal);
+		terminalsClient.addTerminal(terminal);
+		return terminal;
 	}
 
 	/**

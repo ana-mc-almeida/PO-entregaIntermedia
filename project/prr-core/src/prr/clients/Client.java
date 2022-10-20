@@ -27,10 +27,6 @@ public class Client implements Serializable {
     /* atributos que ainda não estão implementados */
     // private Notification[] notifications;
 
-    public String showLevel() {
-        return level.show();
-    }
-
     public Client(String key, String name, int taxId) throws DuplicateClientKeyException {
         this.key = key;
         this.name = name;
@@ -46,6 +42,10 @@ public class Client implements Serializable {
 
     public void addTerminal(Terminal terminal) {
         terminals.add(terminal);
+    }
+
+    public String showLevel() {
+        return level.show();
     }
 
     // public String getName() {

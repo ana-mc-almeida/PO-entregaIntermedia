@@ -22,42 +22,32 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         // FIXME define methods
 
         private String key;
-        private String type;
         private Double debts = 0.0;
         private Double payments = 0.0;
         private Client client;
         // private List<Terminal> terminalsFriends;
         private List<Communication> communications;
         // private TerminalState state;
-        private String state = "IDLE";
+        private TerminalState state;
 
         public Terminal(String key, Client client) {
                 this.key = key;
                 this.client = client;
-                // payments = 0;
-                // debts = 0;
-                // state = new TerminalState(this);
-                state = "IDLE";
-
-        }
-
-        public Terminal(String key, Client client, String state) {
-                this.key = key;
-                this.client = client;
-                // payments = 0;
-                // debts = 0;
-                // this.state = new TerminalState(this);
-                // this.state.setState(state);
-                this.state = state;
-                if (state.equals("ON"))
-                        this.state = "IDLE";
+                state = new StateIdle();
                 communications = new ArrayList<Communication>();
-                // System.out.println("AAAAAAAAAAAAAAAAAAAAA - " + state);
-                // System.out.println("BBBBBBBBBBBBBBBBBBBBB - " + this.state);
         }
 
-        public void setType(String type) {
-                this.type = type;
+        // public Terminal(String key, Client client, TerminalState state) {
+        // this.key = key;
+        // this.client = client;
+        // this.state = state;
+        // communications = new ArrayList<Communication>();
+        // }
+
+        public abstract String getTypeName();
+
+        public void setState(TerminalState state) {
+                this.state = state;
         }
 
         /**
@@ -88,11 +78,9 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         @Override
         public String toString() {
-                // return type + "|" + key + "|" + client.getKey() + "|" + state.status() + "|"
-                // + payments + "|"
-                // + debts; /* faltam os friends */
-                // System.out.println("CCCCCCCCCCCCCCCCCCC - " + this.state);
-                return type + "|" + key + "|" + client.getKey() + "|" + this.state + "|" + Math.round(payments) + "|"
+                return getTypeName() + "|" + key + "|" + client.getKey() + "|" + state.getName() + "|"
+                                + Math.round(payments)
+                                + "|"
                                 + Math.round(debts); /* faltam os friends */
         }
 }

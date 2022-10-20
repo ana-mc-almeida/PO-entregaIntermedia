@@ -1,22 +1,11 @@
 package prr.terminals;
 
+import java.io.Serializable;
+
 /**
- * Abstract terminal state. -> por enquando ainda nao está como abstrata
+ * Abstract terminal state.
  */
-public class TerminalState {
-    private Terminal terminal;
-    private String state;
+public abstract class TerminalState implements Serializable {
 
-    public TerminalState(Terminal terminal) {
-        this.terminal = terminal;
-        state = "espera";
-    }
-
-    public String status() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
+    public abstract String getName();
 }
