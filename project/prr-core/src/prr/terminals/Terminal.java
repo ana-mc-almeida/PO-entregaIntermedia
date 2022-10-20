@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import prr.clients.Client;
+import prr.communications.Communication;
 
 // FIXME add more import if needed (cannot import from pt.tecnico or prr.app)
 
@@ -26,7 +27,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         private Double payments = 0.0;
         private Client client;
         // private List<Terminal> terminalsFriends;
-        // private List<Communications> communications;
+        private List<Communication> communications;
         // private TerminalState state;
         private String state = "IDLE";
 
@@ -50,6 +51,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                 this.state = state;
                 if (state.equals("ON"))
                         this.state = "IDLE";
+                communications = new ArrayList<Communication>();
                 // System.out.println("AAAAAAAAAAAAAAAAAAAAA - " + state);
                 // System.out.println("BBBBBBBBBBBBBBBBBBBBB - " + this.state);
         }
@@ -78,6 +80,10 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         public boolean canStartCommunication() {
                 // FIXME add implementation code
                 return true;
+        }
+
+        public boolean isUnused() {
+                return communications.size() == 0;
         }
 
         @Override

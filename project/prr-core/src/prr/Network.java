@@ -182,12 +182,13 @@ public class Network implements Serializable {
 		return client.toString();
 	}
 
-	public Collection<String> showAllClients() {
+	public String showAllClients() {
 		List<String> clientStrings = new ArrayList<String>();
 		for (Client client : clients.values()) {
 			clientStrings.add(client.toString());
 		}
-		return clientStrings;
+		return String.join("\n", clientStrings);
+
 	}
 
 	public Client getClientByKey(String key) throws UnknownClientKeyException {
@@ -202,12 +203,12 @@ public class Network implements Serializable {
 		return terminal.toString();
 	}
 
-	public Collection<String> showAllTerminals() {
+	public String showAllTerminals() {
 		List<String> terminalStrings = new ArrayList<String>();
 		for (Terminal terminal : terminals.values()) {
 			terminalStrings.add(terminal.toString());
 		}
-		return terminalStrings;
+		return String.join("\n", terminalStrings);
 	}
 
 	public Terminal getTerminalByKey(String key) throws UnknownTerminalKeyException {
@@ -216,4 +217,14 @@ public class Network implements Serializable {
 			throw new UnknownTerminalKeyException(key);
 		return terminal;
 	}
+
+	public String ShowUnusedTerminals() {
+		List<String> terminalStrings = new ArrayList<String>();
+		for (Terminal terminal : terminals.values()) {
+			if (terminal.isUnused())
+				terminalStrings.add(terminal.toString());
+		}
+		return String.join("\n", terminalStrings);
+	}
+
 }
