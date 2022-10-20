@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sound.sampled.LineUnavailableException;
+
 import prr.Network;
 import prr.terminals.Terminal;
 import prr.exceptions.DuplicateClientKeyException;
@@ -20,16 +22,20 @@ public class Client implements Serializable {
 
     private List<Terminal> terminals;
 
-    // private ClientLevel level;
-    private String level = "NORMAL";
+    private ClientLevel level;
+    // private String level = "NORMAL";
     /* atributos que ainda não estão implementados */
     // private Notification[] notifications;
+
+    public String showLevel() {
+        return level.show();
+    }
 
     public Client(String key, String name, int taxId) throws DuplicateClientKeyException {
         this.key = key;
         this.name = name;
         this.taxId = taxId;
-        // level = new ClientLevel(this);
+        level = new ClientNormal(this);
         allowNotifications = true;
         terminals = new ArrayList<Terminal>();
     }
@@ -65,7 +71,7 @@ public class Client implements Serializable {
      */
     @Override
     public String toString() {
-        return "CLIENT|" + key + "|" + name + "|" + taxId + "|" + level + "|" + (allowNotifications ? "YES"
+        return "CLIENT|" + key + "|" + name + "|" + taxId + "|" + showLevel() + "|" + (allowNotifications ? "YES"
                 : "NO") + "|" + terminals.size() + "|" + calculatePayments() + "|" + calculateDebts();
         // return "CLIENT|" + key + "|" + name + "|" + taxId + "|" + level.status() +
         // "|" + (allowNotifications ? "YES"

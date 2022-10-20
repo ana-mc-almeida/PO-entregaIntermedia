@@ -1,6 +1,8 @@
 package prr.clients;
 
-public class ClientLevel {
+import java.io.Serializable;
+
+public abstract class ClientLevel implements Serializable {
 
     private Client client;
 
@@ -8,8 +10,10 @@ public class ClientLevel {
         this.client = client;
     }
 
-    public String status() {
-        return "Normal";
+    public abstract String getName();
+
+    public String show() {
+        return this.getName();
     }
 
 }
