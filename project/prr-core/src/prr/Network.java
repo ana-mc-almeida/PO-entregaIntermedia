@@ -46,12 +46,13 @@ public class Network implements Serializable {
 	/**
 	 * Stores the network's clients.
 	 */
-	private final Map<String, Client> clients = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+	private final Map<String, Client> clients = new TreeMap<>();
+	private final Map<String, Client> clientsToShow = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
 	/**
 	 * Stores the network's terminals.
 	 */
-	private final Map<String, Terminal> terminals = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+	private final Map<String, Terminal> terminals = new TreeMap<>();
 
 	/**
 	 * Stores the network's communications.
@@ -102,7 +103,7 @@ public class Network implements Serializable {
 
 		Client newClient = new Client(key, name, taxId);
 		clients.put(key, newClient);
-
+		clientsToShow.put(key, newClient);
 	}
 
 	/**
@@ -202,7 +203,7 @@ public class Network implements Serializable {
 
 	public String showAllClients() {
 		List<String> clientStrings = new ArrayList<String>();
-		for (Client client : clients.values()) {
+		for (Client client : clientsToShow.values()) {
 			clientStrings.add(client.toString());
 		}
 		return String.join("\n", clientStrings);
