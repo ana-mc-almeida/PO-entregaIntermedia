@@ -205,18 +205,13 @@ public class Network implements Serializable {
 	 * @throws UnknownTerminalKeyException if the given terminal is unknown
 	 */
 	public void registerFriends(String terminalKey, String friendsKeys) throws UnknownTerminalKeyException {
-		if (!terminals.containsKey(terminalKey))
-			throw new UnknownTerminalKeyException(terminalKey);
 
-		Terminal terminal = terminals.get(terminalKey);
+		Terminal terminal = getTerminalByKey(terminalKey);
 
 		String[] friends = friendsKeys.split(",");
-		for (String friendKey : friends) {
-			if (!terminals.containsKey(friendKey))
-				throw new UnknownTerminalKeyException(terminalKey);
-
+		for (String friendKey : friends)
 			terminal.addFriend(getTerminalByKey(friendKey));
-		}
+
 	}
 
 	/**
@@ -292,9 +287,10 @@ public class Network implements Serializable {
 	 * @throws UnknownTerminalKeyException if the given terminal is unknown
 	 */
 	public Terminal getTerminalByKey(String key) throws UnknownTerminalKeyException {
-		if (!terminals.containsKey(key))
+		Terminal terminal = terminals.get(key);
+		if (terminal == null)
 			throw new UnknownTerminalKeyException(key);
-		return terminals.get(key);
+		return terminal;
 	}
 
 	/**
