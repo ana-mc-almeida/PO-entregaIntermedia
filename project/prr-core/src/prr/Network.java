@@ -67,8 +67,10 @@ public class Network implements Serializable {
 	 *                                    the text file
 	 */
 	void importFile(String filename)
-			throws UnrecognizedEntryException, IOException, DuplicateClientKeyException, InvalidTerminalKeyException,
-			DuplicateTerminalKeyException, UnknownClientKeyException /* FIXME maybe other exceptions */ {
+			throws UnrecognizedEntryException, IOException,
+			DuplicateClientKeyException, InvalidTerminalKeyException,
+			DuplicateTerminalKeyException, UnknownClientKeyException,
+			UnknownTerminalKeyException /* FIXME maybe other exceptions */ {
 		// FIXME implement method
 		try (BufferedReader in = new BufferedReader(new FileReader(filename))) {
 			String line;
@@ -77,7 +79,7 @@ public class Network implements Serializable {
 				switch (fields[0]) {
 					case "CLIENT" -> this.registerClient(fields[1], fields[2], Integer.parseInt(fields[3]));
 					case "BASIC", "FANCY" -> this.importTerminal(fields[0], fields[1], fields[2], fields[3]);
-					case "FRIENDS" -> this.registerFriends(fields);
+					case "FRIENDS" -> this.registerFriends(fields[1], fields[2]);
 					default -> throw new UnrecognizedEntryException(String.join("|", fields));
 				}
 			}
@@ -178,8 +180,19 @@ public class Network implements Serializable {
 	 *                                    fields
 	 *                                    for its type
 	 */
-	public void registerFriends(String[] fields) throws UnrecognizedEntryException {
+	public void registerFriends(String terminalKey, String friendsKeys) throws UnknownTerminalKeyException {
+		if (!terminals.containsKey(terminalKey))
+			throw new UnknownTerminalKeyException(terminalKey);
 
+		Terminal terminal = terminals.get(terminalKey);
+
+		String[] friends = friendsKeys.split(",");
+		for (String friendKey : friends) {
+			if (!terminals.containsKey(friendKey))
+				throw new UnknownTerminalKeyException(terminalKey);
+
+			terminal.addFriend(getTerminalByKey(friendKey));
+		}
 	}
 
 	public String showClient(String key) throws UnknownClientKeyException {
@@ -217,10 +230,9 @@ public class Network implements Serializable {
 	}
 
 	public Terminal getTerminalByKey(String key) throws UnknownTerminalKeyException {
-		Terminal terminal = terminals.get(key);
-		if (terminal == null)
+		if (!terminals.containsKey(key))
 			throw new UnknownTerminalKeyException(key);
-		return terminal;
+		return terminals.get(key);
 	}
 
 	public String ShowUnusedTerminals() {

@@ -1,6 +1,8 @@
 package prr.terminals;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +27,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         private Double debts = 0.0;
         private Double payments = 0.0;
         private Client client;
-        // private List<Terminal> terminalsFriends;
+        private List<Terminal> friends;
         private List<Communication> communications;
         // private TerminalState state;
         private TerminalState state;
@@ -35,6 +37,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                 this.client = client;
                 state = new StateIdle();
                 communications = new ArrayList<Communication>();
+                friends = new ArrayList<Terminal>();
         }
 
         // public Terminal(String key, Client client, TerminalState state) {
@@ -76,11 +79,30 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                 return communications.size() == 0;
         }
 
+        public void addFriend(Terminal friend) {
+                friends.add(friend);
+        }
+
+        public String friendsToString() {
+                List<String> friendsStrings = new ArrayList<String>();
+                for (Terminal friend : friends) {
+                        friendsStrings.add(friend.getKey());
+                }
+                return String.join(",", friendsStrings);
+        }
+
         @Override
         public String toString() {
-                return getTypeName() + "|" + key + "|" + client.getKey() + "|" + state.getName() + "|"
+                String s = getTypeName() + "|" + key + "|" + client.getKey() + "|" + state.getName() + "|"
                                 + Math.round(payments)
                                 + "|"
-                                + Math.round(debts); /* faltam os friends */
+                                + Math.round(debts);
+                if (friends.size() != 0)
+                        s += "|" + friendsToString();
+                return s;
+        }
+
+        public String getKey() {
+                return key;
         }
 }

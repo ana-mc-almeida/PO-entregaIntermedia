@@ -12,8 +12,8 @@ import prr.exceptions.ImportFileException;
 import prr.exceptions.MissingFileAssociationException;
 import prr.exceptions.UnavailableFileException;
 import prr.exceptions.UnrecognizedEntryException;
+import prr.exceptions.UnknownTerminalKeyException;
 
-import prr.exceptions.UnrecognizedEntryException;
 import prr.exceptions.DuplicateClientKeyException;
 import prr.exceptions.DuplicateTerminalKeyException;
 import prr.exceptions.InvalidTerminalKeyException;
@@ -104,8 +104,9 @@ public class NetworkManager {
 	public void importFile(String filename) throws ImportFileException {
 		try {
 			_network.importFile(filename);
-		} catch (IOException | UnrecognizedEntryException | DuplicateClientKeyException | InvalidTerminalKeyException
-				| DuplicateTerminalKeyException | UnknownClientKeyException/* FIXME maybe other exceptions */ e) {
+		} catch (IOException | UnrecognizedEntryException | DuplicateClientKeyException
+				| InvalidTerminalKeyException | DuplicateTerminalKeyException
+				| UnknownClientKeyException | UnknownTerminalKeyException/* FIXME maybe other exceptions */ e) {
 			throw new ImportFileException(filename, e);
 		}
 	}
