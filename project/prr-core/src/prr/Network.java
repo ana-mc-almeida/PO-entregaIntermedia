@@ -47,6 +47,9 @@ public class Network implements Serializable {
 	 * Stores the network's clients.
 	 */
 	private final Map<String, Client> clients = new TreeMap<>();
+	/**
+	 * Stores the network's clients sorted in CASE_INSENSITIVE_ORDER.
+	 */
 	private final Map<String, Client> clientsToShow = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
 	/**
@@ -63,15 +66,24 @@ public class Network implements Serializable {
 	 * Read text input file and create corresponding domain entities.
 	 * 
 	 * @param filename name of the text input file
-	 * @throws UnrecognizedEntryException if some entry is not correct
-	 * @throws IOException                if there is an IO erro while processing
-	 *                                    the text file
+	 * @throws UnrecognizedEntryException    if some entry is not correct
+	 * @throws IOException                   if there is an IO erro while processing
+	 *                                       the text file
+	 * @throws DuplicateClientKeyException   if a client with the given key
+	 *                                       (case-insensitive) already exists
+	 * @throws InvalidTerminalKeyException   if the given terminal key is not a
+	 *                                       numeric string with 6 digits
+	 * @throws DuplicateTerminalKeyException if a terminal with the given key
+	 *                                       (case-insensitive) already exists
+	 * @throws UnknownClientKeyException     if the given client is unknown
+	 * @throws UnknownTerminalKeyException   if the given terminal is unknown
+	 * 
 	 */
 	void importFile(String filename)
 			throws UnrecognizedEntryException, IOException,
 			DuplicateClientKeyException, InvalidTerminalKeyException,
 			DuplicateTerminalKeyException, UnknownClientKeyException,
-			UnknownTerminalKeyException /* FIXME maybe other exceptions */ {
+			UnknownTerminalKeyException {
 		// FIXME implement method
 		try (BufferedReader in = new BufferedReader(new FileReader(filename))) {
 			String line;
@@ -88,14 +100,14 @@ public class Network implements Serializable {
 	}
 
 	/**
-	 * Parse and import a client entry from a plain text file.
-	 * 
-	 * A correct client entry has the following format: {@code CLIENT|id|nome|taxId}
+	 * Register a new client in this network, which will be created from the
+	 * given parameters.
 	 *
-	 * @param fields The fields of the client to import, that were split by the
-	 *               separator
-	 * @throws DuplicateClientKeyException if already exists a client with the given
-	 *                                     key.
+	 * @param key   The key of the client
+	 * @param name  The name of the client
+	 * @param taxId The taxId of the client
+	 * @throws DuplicateClientKeyException if a client with the given key
+	 *                                     (case-insensitive) already exists
 	 */
 	public void registerClient(String key, String name, int taxId) throws DuplicateClientKeyException {
 		if (clients.containsKey(key))
@@ -107,27 +119,36 @@ public class Network implements Serializable {
 	}
 
 	/**
-	 * Parse and import a partner entry from a plain text file.
-	 * <p>
-	 * A correct partner entry has the following format:
-	 * {@code PARTNER|id|name|address}
+	 * Parse and import a terminal entry from a plain text file, which will need the
+	 * given parameters.
 	 *
-	 * @param fields The fields of the partner to import, that were split by the
-	 *               separator
-	 * @throws IllegalEntryException if the entry does not have the correct fields
-	 *                               for its type
+	 * @param type      The type of the terminal (BASIC ou FANCY)
+	 * @param key       The key of the terminal
+	 * @param keyClient The key of the terminal's owner
+	 * @param state     The state of the terminal (ON, OFF or SILENCE)
+	 * @throws UnrecognizedEntryException    if some entry is not correct
+	 * @throws InvalidTerminalKeyException   if the given terminal key is not a
+	 *                                       numeric string with 6 digits
+	 * @throws DuplicateTerminalKeyException if a terminal with the given key
+	 *                                       (case-insensitive) already exists
+	 * @throws UnknownClientKeyException     if the given client is unknown
 	 */
 	private void importTerminal(String type, String key, String keyClient, String state)
 			throws UnrecognizedEntryException, InvalidTerminalKeyException, DuplicateTerminalKeyException,
-			UnknownClientKeyException, UnrecognizedEntryException {
+			UnknownClientKeyException {
 		TerminalState terminalState = getTerminalState(state);
 		Terminal terminal = registerTerminal(type, key, keyClient);
 		terminal.setState(terminalState);
 	}
 
 	/*
+	 * Parse the terminal state
 	 * 
+	 * @param state The state of the terminal (ON, OFF or SILENCE)
 	 * 
+	 * @return The corresponding {@link TerminalState}
+	 * 
+	 * @throws UnrecognizedEntryException if some entry is not correct
 	 */
 	private TerminalState getTerminalState(String state) throws UnrecognizedEntryException {
 		return switch (state) {
@@ -139,15 +160,22 @@ public class Network implements Serializable {
 	}
 
 	/**
-	 * Parse and import a terminal entry from a plain text file.
-	 * 
-	 * A correct terminal entry has the following format:
-	 * {@code terminal-type|idTerminal|idClient|state}
+	 * Register a new terminal in this network, which will be created from the
+	 * given parameters.
 	 *
-	 * @param fields The fields of the terminal to import, that were split by the
-	 *               separator
-	 * @throws UnrecognizedEntryException if the entry does not have the correct
-	 *                                    fields for its type
+	 * @param type      The type of the terminal (BASIC ou FANCY)
+	 * @param key       The key of the terminal
+	 * @param keyClient The key of the terminal's owner
+	 * 
+	 * @return The {@link Terminal} that was just created
+	 * 
+	 * @throws UnrecognizedEntryException    if some entry is not correct
+	 * @throws InvalidTerminalKeyException   if the given terminal key is not a
+	 *                                       numeric string with 6 digits
+	 * @throws DuplicateTerminalKeyException if a terminal with the given key
+	 *                                       (case-insensitive) already exists
+	 * @throws UnknownClientKeyException     if the given client is unknown
+	 * @throws UnknownTerminalKeyException   if the given terminal is unknown
 	 */
 	public Terminal registerTerminal(String type, String key, String keyClient)
 			throws InvalidTerminalKeyException, DuplicateTerminalKeyException,
@@ -170,16 +198,11 @@ public class Network implements Serializable {
 	}
 
 	/**
-	 * Parse and import a friends entry from a plain text file.
-	 * 
-	 * A correct friends entry has the following format:
-	 * {@code FRIENDS|idTerminal|idTerminal1,...,idTerminalN}
+	 * Register the friends of the given terminal.
 	 *
-	 * @param fields The fields of the friends connection to import, that were split
-	 *               by the separator
-	 * @throws UnrecognizedEntryException if the entry does not have the correct
-	 *                                    fields
-	 *                                    for its type
+	 * @param terminalKey The key of the terminal
+	 * @param friendsKeys The friends to regist
+	 * @throws UnknownTerminalKeyException if the given terminal is unknown
 	 */
 	public void registerFriends(String terminalKey, String friendsKeys) throws UnknownTerminalKeyException {
 		if (!terminals.containsKey(terminalKey))
@@ -196,11 +219,23 @@ public class Network implements Serializable {
 		}
 	}
 
+	/**
+	 * Show a client.
+	 *
+	 * @param key The key of the client
+	 * @return The {@link Client} associated with the given key
+	 * @throws UnknownClientKeyException if the given terminal is unknown
+	 */
 	public String showClient(String key) throws UnknownClientKeyException {
 		Client client = getClientByKey(key);
 		return client.toString();
 	}
 
+	/**
+	 * Show all clients known to the network.
+	 *
+	 * @return A sorted {@link Collection} of clients
+	 */
 	public String showAllClients() {
 		List<String> clientStrings = new ArrayList<String>();
 		for (Client client : clientsToShow.values()) {
@@ -210,18 +245,23 @@ public class Network implements Serializable {
 
 	}
 
-	public Client getClientByKey(String key) throws UnknownClientKeyException {
-		Client client = clients.get(key);
-		if (client == null)
-			throw new UnknownClientKeyException(key);
-		return client;
-	}
-
+	/**
+	 * Show a terminal.
+	 *
+	 * @param key The key of the terminal
+	 * @return The {@link Terminal} associated with the given key
+	 * @throws UnknownTerminalKeyException if the given terminal is unknown
+	 */
 	public String showTerminal(String key) throws UnknownTerminalKeyException {
 		Terminal terminal = getTerminalByKey(key);
 		return terminal.toString();
 	}
 
+	/**
+	 * Show all terminals known to the network,
+	 *
+	 * @return A sorted {@link Collection} of terminals
+	 */
 	public String showAllTerminals() {
 		List<String> terminalStrings = new ArrayList<String>();
 		for (Terminal terminal : terminals.values()) {
@@ -230,12 +270,38 @@ public class Network implements Serializable {
 		return String.join("\n", terminalStrings);
 	}
 
+	/**
+	 * Get a client by its key.
+	 *
+	 * @param key The key of the client
+	 * @return The {@link Client} associated with the given key
+	 * @throws UnknownClientKeyException if the given terminal is unknown
+	 */
+	public Client getClientByKey(String key) throws UnknownClientKeyException {
+		Client client = clients.get(key);
+		if (client == null)
+			throw new UnknownClientKeyException(key);
+		return client;
+	}
+
+	/**
+	 * Get a terminal by its key.
+	 *
+	 * @param key The key of the terminal
+	 * @return The {@link Terminal} associated with the given key
+	 * @throws UnknownTerminalKeyException if the given terminal is unknown
+	 */
 	public Terminal getTerminalByKey(String key) throws UnknownTerminalKeyException {
 		if (!terminals.containsKey(key))
 			throw new UnknownTerminalKeyException(key);
 		return terminals.get(key);
 	}
 
+	/**
+	 * Lookup all the terminals that haven't been used yet.
+	 *
+	 * @return A sorted {@link Collection} of terminals that haven't been used yet
+	 */
 	public String ShowUnusedTerminals() {
 		List<String> terminalStrings = new ArrayList<String>();
 		for (Terminal terminal : terminals.values()) {
