@@ -29,7 +29,6 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         private Client client;
         private List<Terminal> friends;
         private List<Communication> communications;
-        // private TerminalState state;
         private TerminalState state;
 
         public Terminal(String key, Client client) {
@@ -40,14 +39,11 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                 friends = new ArrayList<Terminal>();
         }
 
-        // public Terminal(String key, Client client, TerminalState state) {
-        // this.key = key;
-        // this.client = client;
-        // this.state = state;
-        // communications = new ArrayList<Communication>();
-        // }
-
         public abstract String getTypeName();
+
+        public String getKey() {
+                return key;
+        }
 
         public void setState(TerminalState state) {
                 this.state = state;
@@ -100,9 +96,5 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                 if (friends.size() != 0)
                         s += "|" + friendsToString();
                 return s;
-        }
-
-        public String getKey() {
-                return key;
         }
 }
